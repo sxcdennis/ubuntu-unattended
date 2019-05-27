@@ -87,10 +87,13 @@ d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 
-
 # grub boot loader
 d-i grub-installer/only_debian                              boolean     true
 d-i grub-installer/with_other_os                            boolean     true
+
+# set late command
+d-i pkgsel/include string openssh-server
+d-i preseed/late_command string in-target sh -c 'sed -i "s/^#PermitRootLogin.*\$/PermitRootLogin yes/g" /etc/ssh/sshd_config';
 
 # finish installation
 d-i finish-install/reboot_in_progress                       note
