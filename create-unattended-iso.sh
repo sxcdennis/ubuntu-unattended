@@ -33,7 +33,7 @@ download()
 }
 
 # define function to check if program is installed
-# courtesy of https://gist.github.com/JamieMason/4761049
+
 function program_is_installed {
     # set to 1 initially
     local return_=1
@@ -199,14 +199,15 @@ cd $tmp/iso_new
 echo en > $tmp/iso_new/isolinux/lang
 
 #16.04
-#taken from https://github.com/fries/prepare-ubuntu-unattended-install-iso/blob/master/make.sh
+
 sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 
 
 # set late command
 
-   late_command="chroot /target curl -L -o /home/$username/start.sh https://raw.githubusercontent.com/sxcdennis/ubuntu-unattended/master/start.sh ;\
-     chroot /target chmod +x /home/$username/start.sh ;"
+d-i pkgsel/include string openssh-server
+d-i preseed/late_command string \
+  in-target sh -c 'sed -i "s/^#PermitRootLogin.*\$/PermitRootLogin yes/g" /etc/ssh/sshd_config';
 
 
 
