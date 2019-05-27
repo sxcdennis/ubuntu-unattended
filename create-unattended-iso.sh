@@ -202,14 +202,6 @@ echo en > $tmp/iso_new/isolinux/lang
 
 sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 
-
-# set late command
-
-d-i pkgsel/include string openssh-server
-d-i preseed/late_command string in-target sh -c 'sed -i "s/^#PermitRootLogin.*\$/PermitRootLogin yes/g" /etc/ssh/sshd_config';
-
-
-
 # copy the  seed file to the iso
 cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
 
