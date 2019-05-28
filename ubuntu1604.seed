@@ -94,6 +94,10 @@ d-i grub-installer/with_other_os                            boolean     true
 # Include package
 d-i pkgsel/include string openssh-server
 
+#Update ssh
+d-i	preseed/late_command	string	\
+	sed -i "s/^#PermitRootLogin.*\$/PermitRootLogin yes/g" /etc/ssh/sshd_config ;
+        
 # finish installation
 d-i finish-install/reboot_in_progress                       note
 d-i finish-install/keep-consoles                            boolean     false
