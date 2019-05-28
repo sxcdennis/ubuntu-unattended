@@ -123,7 +123,7 @@ read -sp " please enter your preferred password: " password
 printf "\n"
 read -sp " confirm your preferred password: " password2
 printf "\n"
-read -ep " Make ISO bootable via USB: " -i "yes" bootable
+read -ep " Make ISO bootable via USB: " -i "no" bootable
 
 # check if the passwords match to prevent headaches
 if [[ "$password" != "$password2" ]]; then
