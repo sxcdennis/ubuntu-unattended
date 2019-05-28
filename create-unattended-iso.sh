@@ -207,7 +207,7 @@ cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
 
 # set late command
 
-   late_command='sed -i "s|PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config;'
+   late_command='sed -i "s|PermitRootLogin prohibit-password|PermitRootLogin yes|g" /etc/ssh/sshd_config'
      
 # include firstrun script
 echo "
