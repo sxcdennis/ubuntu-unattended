@@ -56,21 +56,12 @@ if [ $currentuser != "root" ]; then
     exit 1
 fi
 
-#check that we are in ubuntu 16.04+
-
-case "$(lsb_release -rs)" in
-    16*|18*) ub1604="yes" ;;
-    *) ub1604="" ;;
-esac
-
 # define versions 
 
 ver1=ver1
 ver2=ver2
 ver3=16.04
 ver4=ver4
-
-
 
 # ask whether to include vmware tools or not
 while true; do
@@ -186,8 +177,6 @@ spinner $!
 cd $tmp/iso_new
 #doesn't work for 16.04
 echo en > $tmp/iso_new/isolinux/lang
-
-#16.04
 
 sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 
