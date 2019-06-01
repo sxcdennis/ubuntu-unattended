@@ -5,7 +5,7 @@ tmp="$HOME"  # destination folder to store the final iso file
 hostname="ubuntu"
 currentuser="$( whoami)"
 
-# define spinner function for slow tasks
+# define spinner function
 spinner()
 {
     local pid=$1
@@ -63,45 +63,41 @@ case "$(lsb_release -rs)" in
     *) ub1604="" ;;
 esac
 
-#get the latest versions of Ubuntu LTS
+# define versions 
 
-tmphtml=$tmp/tmphtml
-rm $tmphtml >/dev/null 2>&1
-wget -O $tmphtml 'http://releases.ubuntu.com/' >/dev/null 2>&1
-
-prec=$(fgrep Precise $tmphtml | head -1 | awk '{print $3}')
-trus=$(fgrep Trusty $tmphtml | head -1 | awk '{print $3}')
-xenn=16.04
-bion=$(fgrep Bionic $tmphtml | head -1 | awk '{print $3}')
+ver1=ver1
+ver2=ver2
+ver3=16.04
+ver4=ver4
 
 
 
 # ask whether to include vmware tools or not
 while true; do
-    echo " which ubuntu edition would you like to remaster:"
+    echo " Which ubuntu edition would you like to remaster:"
     echo
-    echo "  [1] Ubuntu $prec LTS Server amd64 - Precise Pangolin"
-    echo "  [2] Ubuntu $trus LTS Server amd64 - Trusty Tahr"
-    echo "  [3] Ubuntu $xenn LTS Server amd64 - Xenial Xerus"
-    echo "  [4] Ubuntu $bion LTS Server amd64 - Bionic Beaver"
+    echo "  [1] Ubuntu $ver1 LTS Server amd64 - Define This"
+    echo "  [2] Ubuntu $ver2 LTS Server amd64 - Define This"
+    echo "  [3] Ubuntu $ver3 LTS Server amd64 - 16.04"
+    echo "  [4] Ubuntu $ver4 LTS Server amd64 - Define This"
     echo
-    read -p " please enter your preference: [1|2|3|4]: " ubver
+    read -p " Please enter your preference: [1|2|3|4]: " ubver
     case $ubver in
-        [1]* )  download_file="ubuntu-$prec-server-amd64.iso"           # filename of the iso to be downloaded
-                download_location="http://releases.ubuntu.com/$prec/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-$prec-server-amd64-unattended.iso" # filename of the new iso file to be created
+        [1]* )  download_file="ubuntu-$ver1-server-amd64.iso"           # filename of the iso to be downloaded
+                download_location="http://releases.ubuntu.com/$ver1/"     # location of the file to be downloaded
+                new_iso_name="ubuntu-$ver1-server-amd64-unattended.iso" # filename of the new iso file to be created
                 break;;
-        [2]* )  download_file="ubuntu-$trus-server-amd64.iso"             # filename of the iso to be downloaded
-                download_location="http://releases.ubuntu.com/$trus/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-$trus-server-amd64-unattended.iso"   # filename of the new iso file to be created
+        [2]* )  download_file="ubuntu-$ver2-server-amd64.iso"             # filename of the iso to be downloaded
+                download_location="http://releases.ubuntu.com/$ver2/"     # location of the file to be downloaded
+                new_iso_name="ubuntu-$ver2-server-amd64-unattended.iso"   # filename of the new iso file to be created
                 break;;
-        [3]* )  download_file="ubuntu-$xenn-server-amd64.iso"
-                download_location="http://releases.ubuntu.com/$xenn/"
-                new_iso_name="ubuntu-$xenn-server-amd64-unattended.iso"
+        [3]* )  download_file="ubuntu-$ver3-server-amd64.iso"
+                download_location="http://releases.ubuntu.com/$ver3/"
+                new_iso_name="ubuntu-$ver3-server-amd64-unattended.iso"
                 break;;
-        [4]* )  download_file="ubuntu-$bion-server-amd64.iso"
-                download_location="http://cdimage.ubuntu.com/releases/$bion/release/"
-                new_iso_name="ubuntu-$bion-server-amd64-unattended.iso"
+        [4]* )  download_file="ubuntu-$ver4-server-amd64.iso"
+                download_location="http://cdimage.ubuntu.com/releases/$ver4/release/"
+                new_iso_name="ubuntu-$ver4-server-amd64-unattended.iso"
                 break;;
         * ) echo " please answer [1], [2], [3] or [4]";;
     esac
@@ -125,21 +121,17 @@ read -sp " confirm your preferred password: " password2
 printf "\n"
 read -ep " Make ISO bootable via USB: " -i "no" bootable
 
-# check if the passwords match to prevent headaches
+# check if the passwords match
 if [[ "$password" != "$password2" ]]; then
-    echo " your passwords do not match; please restart the script and try again"
+    echo " Your passwords do not match; please restart the script and try again"
     echo
     exit
 fi
 
-# download the ubunto iso. If it already exists, do not delete in the end.
+# Check if ubunto iso existis. If it already exists, do not delete in the end.
 cd $tmp
 if [[ ! -f $tmp/$download_file ]]; then
-    echo -n " downloading $download_file: "
-    download "$download_location$download_file"
-fi
-if [[ ! -f $tmp/$download_file ]]; then
-	echo "Error: Failed to download ISO: $download_location$download_file"
+	echo "Error: Failed to find ISO: $download_location$download_file"
 	echo "This file may have moved or may no longer exist."
 	echo
 	echo "You can download it manually and move it to $tmp/$download_file"
@@ -147,37 +139,34 @@ if [[ ! -f $tmp/$download_file ]]; then
 	exit 1
 fi
 
-# download  seed file
-seed_file="ubuntu1604.seed"
+# Check if seed file exists 
+seed_file="unattended-ubuntu.seed"
 if [[ ! -f $tmp/$seed_file ]]; then
-    echo -n " downloading $seed_file: "
-    download "https://raw.githubusercontent.com/sxcdennis/ubuntu-unattended/master/$seed_file"
+    echo " Error: Failed to find seed file: $tmp/$seed_file"
+    echo
+    echo "Please get seed file and rerun the script "
+    exit 1
 fi
 
 # install required packages
 echo " installing required packages"
-if [ $(program_is_installed "mkpasswd") -eq 0 ] || [ $(program_is_installed "mkisofs") -eq 0 ]; then
-    (apt-get -y update > /dev/null 2>&1) &
-    spinner $!
-    (apt-get -y install whois genisoimage > /dev/null 2>&1) &
+if [ $(program_is_installed "mkisofs") -eq 0 ]; then
+    (yum -y install genisoimage > /dev/null 2>&1) &
     spinner $!
 fi
 if [[ $bootable == "yes" ]] || [[ $bootable == "y" ]]; then
     if [ $(program_is_installed "isohybrid") -eq 0 ]; then
-      #16.04
-      if [[ $ub1604 == "yes" || $(lsb_release -cs) == "artful" ]]; then
-        (apt-get -y install syslinux syslinux-utils > /dev/null 2>&1) &
-        spinner $!
-      else
-        (apt-get -y install syslinux > /dev/null 2>&1) &
-        spinner $!
+      # Install syslinux
+      if [ $(program_is_installed "syslinux") -eq 0 ]; then 
+          (yum -y install syslinux > /dev/null 2>&1) &
+          spinner $!
       fi
     fi
 fi
 
 
 # create working folders
-echo " remastering your iso file"
+echo " Remastering your iso file"
 mkdir -p $tmp
 mkdir -p $tmp/iso_org
 mkdir -p $tmp/iso_new
@@ -206,11 +195,10 @@ sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
  
 # generate the password hash
-pwhash=$(echo $password | mkpasswd -s -m sha-512)
+pwhash=$(echo '$password' | openssl passwd -1 -stdin)
 
 # update the seed file to reflect the users' choices
-# the normal separator for sed is /, but both the password and the timezone may contain it
-# so instead, I am using @
+
 sed -i "s@{{username}}@$username@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{pwhash}}@$pwhash@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{hostname}}@$hostname@g" $tmp/iso_new/preseed/$seed_file
@@ -223,7 +211,7 @@ seed_checksum=$(md5sum $tmp/iso_new/preseed/$seed_file)
 sed -i "/label install/ilabel autoinstall\n\
   menu label ^Autoinstall Ubuntu Server\n\
   kernel /install/vmlinuz\n\
-  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/ubuntu1604.seed preseed/file/checksum=$seed_checksum --" $tmp/iso_new/isolinux/txt.cfg
+  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/unattended-ubuntu.seed preseed/file/checksum=$seed_checksum --" $tmp/iso_new/isolinux/txt.cfg
 
 echo " creating the remastered iso"
 cd $tmp/iso_new
