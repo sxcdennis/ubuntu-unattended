@@ -5,6 +5,13 @@ tmp="$HOME"  # destination folder to store the final iso file
 hostname="ubuntu"
 currentuser="$( whoami)"
 
+# define Ubuntu versions 
+
+ver1=ver1
+ver2=ver2
+ver3=16.04
+ver4=ver4
+
 # define spinner function
 spinner()
 {
@@ -56,14 +63,7 @@ if [ $currentuser != "root" ]; then
     exit 1
 fi
 
-# define versions 
-
-ver1=ver1
-ver2=ver2
-ver3=16.04
-ver4=ver4
-
-# ask whether to include vmware tools or not
+# Ask Versions
 while true; do
     echo " Which ubuntu edition would you like to remaster:"
     echo
